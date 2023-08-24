@@ -82,5 +82,33 @@ def show_all_cafes():
     all_cafes = result.scalars().all()
     return jsonify(cafes=[cafe.to_dict() for cafe in all_cafes])
 
+
+@app.route('/location/<loc>', methods=["POST", "GET"] )
+def find_cafe(loc):
+    result = db.session.execute(db.select(Cafe))
+    all_cafes = result.scalars().all() #the list has been made
+    cafe_in_loc_list = []
+
+    for cafe in all_cafes:
+        if cafe.location == loc:
+            cafe_in_loc_list.append(cafe)
+
+    if len(cafe_in_loc_list) != 0:
+        cafe_data_in_loc_list = []
+        for cafe in cafe_in_loc_list:
+            cafe_data_json = cafe.to_dict()
+            cafe_data_in_loc_list.append(cafe_data_json)
+        return jsonify(cafe=cafe_data_in_loc_list)
+        
+    else:
+        return jsonify(error={
+            "Not Found" : "Sorry, We dont have a Cafe at that location"
+        })
+
+
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
