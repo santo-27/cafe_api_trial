@@ -105,10 +105,23 @@ def find_cafe(loc):
             "Not Found" : "Sorry, We dont have a Cafe at that location"
         })
 
-
-
-
-
+@app.route('/suggest', methods=["POST", "GET"])
+def add_cafe():
+    new_cafe = Cafe(
+        name = request.form.get("cafe_name_input"),
+        map_url = request.form.get("url_name_input"),
+        img_url = request.form.get("img_url"),
+        location = request.form.get("location"),
+        seats = request.form.get("seats"),
+        has_toilet = int(request.form.get("has_toilet")),
+        has_wifi = int(request.form.get("has_wifi")),
+        has_sockets = int(request.form.get("has_sockets")),
+        can_take_calls = int(request.form.get("can_take_calls")),
+        coffee_price = request.form.get("coffee_price")
+    )
+    db.session.add(new_cafe)
+    db.session.commit()
+    return jsonify(response={"success": "Successfully added the new cafe."})
 
 if __name__ == '__main__':
     app.run(debug=True)
