@@ -105,6 +105,7 @@ def find_cafe(loc):
             "Not Found" : "Sorry, We dont have a Cafe at that location"
         })
 
+#there is no need for us  to create a new html file
 @app.route('/suggest', methods=["POST", "GET"])
 def add_cafe():
     new_cafe = Cafe(
@@ -122,6 +123,48 @@ def add_cafe():
     db.session.add(new_cafe)
     db.session.commit()
     return jsonify(response={"success": "Successfully added the new cafe."})
+
+#there is no need for us  to create a new html file
+@app.route("/update-price/<cafe_id>", methods=["POST", "GET"])
+def change_price(cafe_id):
+    if bool(Cafe.query.filter_by(id=cafe_id).first()):
+        cafe_to_be_edited = db.get_or_404(Cafe, cafe_id)
+        cafe_to_be_edited.coffee_price = request.args.get("updated_price")
+        db.session.commit()
+        return jsonify(response={"success": "Successfully added the new cafe."})
+
+    else:
+        return jsonify(error={
+            "Not Found" : "cafe not found"
+        })        
+
+@app.route("/report-closed/<cafe_id>", methods=["POST", "GET"])
+def remove_cafe(cafe_id):
+    cafe_to_be_removed = db.get_or_404(Cafe, cafe_id)
+    if request.args.get("key") == "TopSecretApi":
+        if cafe_to_be_removed:
+            db.session.delete(cafe_to_be_removed)
+            db.session.commit()
+            # print(request.args.get("api_key"))
+            return jsonify(response={
+                "Success" : "Cafe has been successfully removed"
+            })
+
+        else:
+            return jsonify(errors={
+                "Not Found" : "cafe not found"
+            })
+        
+    else:
+        return jsonify(errors={
+            "Api Key" : "Invalid API KEY"
+        })
+    
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
